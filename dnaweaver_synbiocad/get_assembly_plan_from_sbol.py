@@ -26,19 +26,28 @@ def get_assembly_plan_from_sbol(sbol_doc=None, path=None):
         sbol_doc = sbol.Document()
         sbol_doc.read(path)
 
-    parts_sequences = {
-        seq.displayId.replace('_sequence', '').replace('_seq', ''): seq.elements.upper()
-        for seq in sbol_doc.sequences
-    }
-    parts_per_construct = [
-        (component.displayId.replace('_sequence', '').replace('_seq', ''),
-         [c.displayId[:-2] for c in id_sort(component.components)])
-        for component in sbol_doc.componentDefinitions
-        if len(component.components)
-    ]
+    parts_sequences = {}
+
+    for component in sbol_doc.componentDefinitions:
+        for seq_identity in component.sequences:
+            seq = doc.getSequence(seq_identity)
+
+            if seq.encoding == sbol.SBOL_ENCODING_IUPAC:
+                part_sequences[component.displayId] = seq.elements.upper()
+
+                break;
+
+    parts_per_construct = []
+
+    for component in sbol_doc.componentDefinitions:
+        sub_components = component.getPrimaryStructure()
+
+        if len(sub_components) > 0:
+            parts_per_construct.append((component.displayId.replace('_sequence', '').replace('_seq', ''),
+                                        [c.displayId for c in sub_components]))
 
     constructs_sequences = [
-        (construct_name, "".join([parts_sequences[part] for part in id_sort(parts)]))
+        (construct_name, "".join([parts_sequences[part] for part in parts]))
         for construct_name, parts in parts_per_construct
     ]
     parts_per_construct = OrderedDict(parts_per_construct)
