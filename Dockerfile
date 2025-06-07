@@ -1,15 +1,16 @@
-FROM python:3.6
+FROM continuumio/miniconda3
 
-# Install everything
-RUN apt-get -qq update \
- && apt-get install -y ncbi-blast+
+ENV PATH="/opt/conda/bin:${PATH}"
 
-WORKDIR /home/
+WORKDIR /app
 
-COPY requirements.txt /home
-RUN pip install --upgrade pip \
- && pip install -r requirements.txt
+COPY . /app
 
-COPY docs /home/docs
-COPY dnaweaver_cli /home/methods
-COPY tests /home/methods
+RUN conda install --yes --name base conda-libmamba-solver
+
+RUN conda env create --yes --name dnaweaver --file ./environment.yaml --solver=libmamba
+
+# I/O directory for mounting volume is /app/io_data
+RUN mkdir -p ./io_data
+
+CMD ["/bin/bash", "-c", "source /opt/conda/etc/profile.d/conda.sh && conda activate dnaweaver && python -m dnaweaver_synbiocad ./io_data/cluster_designs.xml ./io_data/gibson_assembly.xlsx gibson"]
