@@ -30,17 +30,20 @@ def get_assembly_plan_from_sbol(sbol_doc=None, path=None):
 
     for component in sbol_doc.componentDefinitions:
         for seq_identity in component.sequences:
-            seq = doc.getSequence(seq_identity)
+            seq = sbol_doc.getSequence(seq_identity)
 
             if seq.encoding == sbol.SBOL_ENCODING_IUPAC:
-                part_sequences[component.displayId] = seq.elements.upper()
+                parts_sequences[component.displayId] = seq.elements.upper()
 
                 break;
 
     parts_per_construct = []
 
     for component in sbol_doc.componentDefinitions:
-        sub_components = component.getPrimaryStructure()
+        try:
+            sub_components = component.getPrimaryStructure()
+        except ValueError:
+            sub_components = []
 
         if len(sub_components) > 0:
             parts_per_construct.append((component.displayId.replace('_sequence', '').replace('_seq', ''),
