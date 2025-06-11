@@ -2,7 +2,7 @@ import dnaweaver as dw
 
 
 def generate_supply_network(
-    parts_sequences,
+    part_sequences,
     already_amplified_fragments,
     already_ordered_primers,
     assembly_method,
@@ -11,12 +11,12 @@ def generate_supply_network(
 
     See the docs for an overview of the supply network.
 
-    :param parts_sequences: A dictionary {part_id: "ATGCGC..."} of the base genetic parts, which will be considered as available for free.
+    :param part_sequences: A dictionary {part_id: "ATGCGC..."} of the base genetic parts, which will be considered as available for free.
     :param already_amplified_fragments: A dictionary {fragment_id: "ATGCTGA"} providing sequences of fragments made for previous assemblies, which will be considered as available for free.
     :param already_ordered_primers: A dictionary {primer_id: "ATGCTGA"} providing sequences of primers ordered for previous assemblies, which will be considered as available for free.
     :param assembly_method: Either "gibson", "golden_gate", or "any_method" (each construct will then be assembled using any method, with a preference for Golden Gate Assembly)
 
-    :type parts_sequences: dict
+    :type part_sequences: dict
     :type already_amplified_fragments: dict
     :type already_ordered_primers: dict
     :type assembly_method: str
@@ -47,7 +47,7 @@ def generate_supply_network(
     parts_pcr_station = dw.PcrExtractionStation(
         name="pcr_part_extension_station",
         primers_supplier=primers_comparator,
-        sequences=parts_sequences,
+        sequences=part_sequences,
         max_overhang_length=30,
         extra_cost=2,
         homology_selector=primer_homology_selector,

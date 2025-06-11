@@ -8,6 +8,7 @@ def compute_all_construct_quotes(
     construct_sequences,
     part_sequences,
     assembly_method,
+    construct_topologies,
     logger="bar",
     max_constructs=None,
 ):
@@ -18,13 +19,13 @@ def compute_all_construct_quotes(
     next construct assembly.
 
     :param construct_sequences: A dict of the form ``{construct_id: "ATGCCC..."}`` of all constructs to be built.
-    :param parts_sequences: A dictionary {part_id: "ATGCGC..."} of the base genetic parts, which will be considered as available for free.
+    :param part_sequences: A dictionary {part_id: "ATGCGC..."} of the base genetic parts, which will be considered as available for free.
     :param assembly_method: Either "gibson", "golden_gate", or "any_method" (each construct will then be assembled using any method, with a preference for Golden Gate Assembly)
     :param logger: A proglog logger
     :param max_constructs: Maximal number of constructs (Default: None)
 
     :type construct_sequences: dict
-    :type parts_sequences: dict
+    :type part_sequences: dict
     :type assembly_method: str
     :type logger: str
     :type max_constructs: int
@@ -55,7 +56,7 @@ def compute_all_construct_quotes(
         # CREATE THE SUPPLY NETWORK
 
         main_station = generate_supply_network(
-            parts_sequences=part_sequences,
+            part_sequences=part_sequences,
             already_amplified_fragments=amplified_fragments,
             already_ordered_primers=ordered_primers,
             assembly_method=assembly_method,
@@ -72,7 +73,7 @@ def compute_all_construct_quotes(
                 # a better position 0
                 rotated_sequence = sequence[shift:] + sequence[:shift]
                 rotated_sequence = SequenceString(
-                    rotated_sequence, metadata={"topology": "circular"}
+                    rotated_sequence, metadata={"topology": construct_topologies[construct]}
                 )
                 main_station.prepare_network_on_sequence(rotated_sequence)
                 quote = main_station.get_quote(rotated_sequence)

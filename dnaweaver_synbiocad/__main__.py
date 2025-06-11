@@ -18,13 +18,14 @@ if __name__ == "__main__":
 
     # PARSE THE SBOL FILE    
     design_data = get_assembly_plan_from_sbol(path=args.input)
-    part_sequences, construct_parts, construct_sequences = design_data
+    part_sequences, construct_parts, construct_sequences, construct_topologies = design_data
 
     # COMPUTE ALL QUOTES
     assembly_strategy_data = compute_all_construct_quotes(
         construct_sequences=construct_sequences,
         part_sequences=part_sequences,
         assembly_method=args.assembly_method,
+        construct_topologies=construct_topologies,
         max_constructs=args.nb_constructs
     )
     quotes, primer_sequences, fragment_quotes, errors = assembly_strategy_data
